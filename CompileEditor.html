@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Compiler</title>
+    </head>
+
+<!--HTML Code-->
+
+
+    <!--Divide body in 2 parts - one for writing code and second for showing code output-->
+    <body style = "display:flex; flex-direction:column; flex:2">
+        
+
+        <!--Divide code part in 2 rows one for heading and language second to write code-->
+        <div style = "display:flex; flex-direction:column; flex:1">
+
+            <!--divide 1st row in 2 parts one for heading other to choose language to work on--> 
+            <div style = "display:flex; flex-direction: row; flex:1; gap:150vh; padding:10px;">
+                
+                <!--Heading Part-->
+                <div>
+                    <h4><b>Type Your Code Here</b></h4>
+                </div>
+
+                <!--Language part-->
+                <div id="langId">
+                    <select id="langSelect" name="lang">
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
+                        <option value="java">Java</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <!--Box to write code in-->
+            <div style="padding: 5px 10px 10px 25px;">
+                <textarea id = "code" style="width: 200vh; height: 50vh;"></textarea>
+            </div>
+            
+            
+        </div>
+
+        <br>
+
+
+
+        <!--Second part of body to display output-->
+        <div>
+            <h3><b><U>OUTPUT:</U></b></h3> <br>
+            <p id = "result"></p>
+        </div>
+        <div>
+            <button id = "compile">Compile</button>
+        </div>
+
+
+        <!--Java Script Code to add functionality-->
+        <script>
+
+            let output = document.getElementById("result");
+
+            //To POST Code
+            let compileBtn = document.getElementById("compile");
+            let codeId;
+
+            compileBtn.addEventListener("click", function(){
+            
+                let code = document.getElementById("code");
+                let lang = document.getElementById("langSelect").value;            
+
+                let file;
+                switch(lang){
+                    case "python":
+                        file = "main.py";
+                        break;
+                    case "javascript":
+                        file = "main.js";
+                        break;
+                    case "java":
+                        file = "Main.java";
+                        break;
+                    case "cpp":
+                        file = "main.cpp";
+                        break;
+                    case "c":
+                        file = "main.c";
+                        break;
+                }
+
+                fetch("https://api.onecompiler.com/v1/run",{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-API-Key":"oc_44v3qdcay_44v3qdcbk_4253d42d9d8cda05b7535d2ab048f0226b04712e24633b13"
+                    },
+                    body: JSON.stringify({
+                        language: lang,
+                        files: [
+                            {
+                                name: file,
+                                content: code.value
+                            }
+                        ]
+                    })
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if (data.status === "success"){
+                        output.innerText = data.stdout;
+                    }
+                    if (data.stderr){
+                        output.innerText = data.stderr;
+                    }
+                    if (data.exception !== null){
+                        output.innerText = data.exception;
+                    }
+                });
+            });
+
+            
+
+
+        </script>
+
+    </body>
+</html>
